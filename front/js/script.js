@@ -1,9 +1,9 @@
 /*Récupération des données depuis l'API*/
 
 async function getData () {
-    const r = await fetch("http://localhost:3000/api/products")
-    if (r.ok === true) {
-        return r.json();
+    const response = await fetch("http://localhost:3000/api/products")
+    if (response.ok === true) {
+        return response.json();
     }
     throw new Error ('Impossible de contacter le serveur')
 }
@@ -23,6 +23,5 @@ getData().then(data => {
           </a>
           `;
       }
-    
 })
 

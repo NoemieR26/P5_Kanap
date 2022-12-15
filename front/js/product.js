@@ -1,6 +1,10 @@
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const id = urlParams.get("id")
+if (id != null) {
+    let itemPrice = 0
+    let imgUrl, altText, productName
+}
 
 
 fetch(`http://localhost:3000/api/products/${id}`)
@@ -8,8 +12,11 @@ fetch(`http://localhost:3000/api/products/${id}`)
     .then((res) => handleData(res))
 
 function handleData(kanap) {
-    console.log({kanap})
      const {colors, name, price, imageUrl, description, altTxt} = kanap
+     itemPrice = price
+     imgUrl = imageUrl
+     altText = altTxt
+     productName = name
      productImage(imageUrl,altTxt)
      productTitle(name)
      productPrice(price)
@@ -23,7 +30,6 @@ function productImage(imageUrl,altTxt) {
     image.alt = altTxt
     const parent = document.querySelector(".item__img")
     if (parent != null) parent.appendChild(image)
-    console.log(image)
 }
 
 function productTitle(name) {
@@ -52,4 +58,37 @@ function productColors(colors) {
             select.appendChild(option)
         })
     }
+}
+
+const button = document.querySelector('#addToCart')
+    button.addEventListener("click", handleClick)
+    
+function handleClick() {
+    const color = document.querySelector("#colors").value
+    const quantity = document.querySelector("#quantity").value
+    if (cartNotValid(color, quantity)) return
+    saveCart(color, quantity)
+    redirectToCart()
+}
+
+function saveCart(color,quantity) {
+    const cartData = {
+                name: productName,
+                id: id,
+                color: color,
+                quantity: Number(quantity),
+                imageUrl: imgUrl,
+                altTxt: altText
+    }
+    localStorage.setItem(id, JSON.stringify(cartData))
+}
+function cartNotValid(color,quantity) {
+    if (color == null || color === "" || quantity == null || quantity == 0) {
+        alert("Merci de selectionner une quantité et un prix")
+        return true
+    }
+}
+
+function redirectToCart() {
+    window.location.href = "cart.html"
 }
