@@ -72,6 +72,7 @@ function handleClick() {
 }
 
 function saveCart(color,quantity) {
+    const key = `${id}-${color}`
     const cartData = {
                 name: productName,
                 id: id,
@@ -80,7 +81,7 @@ function saveCart(color,quantity) {
                 imageUrl: imgUrl,
                 altTxt: altText
     }
-    localStorage.setItem(id, JSON.stringify(cartData))
+    localStorage.setItem(key, JSON.stringify(cartData))
 }
 function cartNotValid(color,quantity) {
     if (color == null || color === "" || quantity == null || quantity == 0) {

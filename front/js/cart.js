@@ -2,16 +2,32 @@
 const cart =[]
 
 retrieveItems()
-
+//getPriceFromAPI()
 cart.forEach((item) => displayItem(item))
 
-/*
-name: ""
-id: 'a557292fe5814ea2b15c6ef4bd73ed83', 
-color: 'White', 
-quantity: 1, 
-imageUrl: 'http://localhost:3000/images/kanap04.jpeg', 
-altTxt: "Photo d'un canapé rose, une à deux place"}
+// Récupération des prix depuis l'API
+
+/*async function getPriceFromAPI(article) {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/products/${article.id}`
+      );
+      const dataFetch = await response.json();
+  
+      const completeItem = {
+        ...article,
+        ...dataFetch,
+      };
+      productDisplay(completeItem);
+  
+      return dataFetch.price;
+      
+    } catch (e) {
+      console.log("Erreur");
+      let fetchError = document.querySelector("#cart__items");
+      fetchError.innerText = "Erreur d'accès au panier";
+    }
+  }
 */
 
 function retrieveItems() {
@@ -22,6 +38,7 @@ function retrieveItems() {
         cart.push(itemObject)
     }
 }
+
 
 // Affichage du produit
 
@@ -40,7 +57,8 @@ function displayItem(item) {
     const cartItemContent = createCartContent(item)
     article.appendChild(cartItemContent)
     displayArticle(article)
-    displayTotalQuantity(item)
+    displayTotalQuantity()
+    //displayTotalPrice(item)
 }
 
 function displayArticle(article) {
@@ -96,7 +114,7 @@ function addSettings(item) {
     settings.classList.add("cart__item__content__settings")
 
     addQuantity(settings, item)
-    addDelete(settings)
+    addDelete(settings, item)
     return settings
 }
 
@@ -114,14 +132,43 @@ function addQuantity(settings, item) {
     input.min = "1"
     input.max = "100"
     input.value = item.quantity
+    input.addEventListener("input", () => updatePriceAndQuantity(item.id, input.value, item))
+    
     quantity.appendChild(input)
     settings.appendChild(quantity)
 }
 
+//Mise à jour du prix et de la quantité
+
+function updatePriceAndQuantity(id, newValue, item) {
+    const itemToUpdate = cart.find((item) => item.id === id)
+    itemToUpdate.quantity = Number(newValue)
+    item.quantity = itemToUpdate.quantity
+    displayTotalQuantity()
+   // displayTotalPrice()
+    saveNewData(item) 
+}
+
+//Suppression d'un article du LocalStorage
+function deleteDataFromCache(item) {
+    const key = `${item.id}-${item.color}`
+    console.log("on retire cette key",key)
+    localStorage.removeItem(key)
+}
+
+
+//Enregistrement des modifications sur le panier
+function saveNewData(item) {
+    const dataToSave = JSON.stringify(item)
+    const key = `${item.id}-${item.color}`
+    localStorage.setItem(key, dataToSave)
+}
+
 // Ajout de l'élément "supprimer"
-function addDelete(settings) {
+function addDelete(settings, item) {
     const deleteDiv = document.createElement("div")
     deleteDiv.classList.add("cart__item__content__settings__delete")
+    deleteDiv.addEventListener("click", () => deleteItem(item))
     const p = document.createElement("p")
     p.classList.add("deleteItem")
     p.textContent = "Supprimer"
@@ -129,9 +176,44 @@ function addDelete(settings) {
     settings.appendChild(deleteDiv)
 }
 
-// Affichage de la quantité totale
-function displayTotalQuantity(item) {
-    const totalQuantity = document.querySelector("#totalQuantity")
-    totalQuantity.textContent = item.quantity
+//Fonction supprimer
+function deleteItem(item) {
+    const itemToDelete = cart.findIndex(
+        (product) => product.id === item.id && product.color === item.color
+    )
+    cart.splice(itemToDelete, 1)
+    displayTotalQuantity
+   // displayTotalPrice
+    deleteDataFromCache(item)
+    deleteProductFromCart(item)
 }
-    
+
+//Suppression du produit sur la page panier
+function deleteProductFromCart(item) {
+    const productToDelete = document.querySelector(
+    'product[data-id="${item.id}"][data-color="${item.color}"]'
+)
+productToDelete.remove()
+}
+
+
+// Affichage de la quantité totale
+function displayTotalQuantity() {
+    let quantity = 0
+    const totalQuantity = document.querySelector("#totalQuantity")
+    const total = cart.reduce((total, item) => total + item.quantity, 0)
+    totalQuantity.textContent = total
+}
+/*    
+//Affichage du prix total
+function displayTotalPrice(item) {
+    let total = 0
+    const totalPrice= document.querySelector("#totalPrice")
+    cart.forEach((item) => {
+        const totalUnitPrice = item.price * item.quantity
+        total += totalUnitPrice
+    })
+    console.log(total)
+    totalPrice.textContent = total
+}
+*/
