@@ -5,6 +5,9 @@ retrieveItems()
 //getPriceFromAPI()
 cart.forEach((item) => displayItem(item))
 
+const orderButton = document.querySelector("#order")
+orderButton.addEventListener("click", (e) => submitForm(e))
+
 // Récupération des prix depuis l'API
 
 /*async function getPriceFromAPI(article) {
@@ -217,3 +220,83 @@ function displayTotalPrice(item) {
     totalPrice.textContent = total
 }
 */
+
+function submitForm(e) {
+    e.preventDefault()
+    if (cart.length === 0) {
+      alert("Merci d'ajouter des articles au panier pour passer commande")
+      return  
+    }
+if (formInvalid()) return
+if (emailInvalid()) return
+
+    const body = formContentRequest()
+    fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      const orderId = data.orderId
+      window.location.href = "../html/confirmation.html" + "?orderId=" + orderId  
+      return console.log(data)  
+    })
+    
+    .catch((err) => console.log(err))
+}
+
+function formInvalid() {
+  const form = document.querySelector(".cart__order__form")
+  const inputs = form.querySelectorAll("input")
+  inputs.forEach((input) => {
+    if (input.value === "") {
+        alert ("Merci de renseigner tous les champs")
+        return true
+    }
+    return false
+  })  
+}
+
+function emailInvalid() {
+    const email = document.querySelector("#email").value
+    const regex = /^[A-Za-z0-9+_.-]+@(.+)$/
+      if (regex.test(email) === false) {
+          alert ("Email invalide")
+          return true
+      }
+      return false
+}
+
+function formContentRequest() {
+    const form = document.querySelector(".cart__order__form")
+    const firstName = form.elements.firstName.value
+    const lastName = form.elements.lastName.value
+    const address = form.elements.address.value
+    const city = form.elements.city.value
+    const email = form.elements.email.value
+    const body = {
+        contact: {
+            firstName: firstName,
+            lastName: lastName,
+            address: address,
+            city: city,
+            email: email
+        },
+        products: getIdsFromCache()
+    }
+    return body
+}
+
+function getIdsFromCache() {
+    const numberOfProducts = localStorage.length
+    const ids = []
+    for (let i = 0; i < numberOfProducts; i++) {
+        const key = localStorage.key(i)
+        const id = key.split("-")[0]
+        ids.push(id)
+    }
+    return ids
+}
