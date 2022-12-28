@@ -1,11 +1,11 @@
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const id = urlParams.get("id")
-if (id != null) {
+/*if (id != null) {
     let itemPrice = 0
     let imgUrl, altText, productName
 }
-
+*/
 
 fetch(`http://localhost:3000/api/products/${id}`)
     .then((response) => response.json())
@@ -22,6 +22,7 @@ function handleData(kanap) {
      productPrice(price)
      productDescription(description)
      productColors(colors)
+     console.log(price)
 }
 
 function productImage(imageUrl,altTxt) {
@@ -62,7 +63,7 @@ function productColors(colors) {
 
 const button = document.querySelector('#addToCart')
     button.addEventListener("click", handleClick)
-    
+
 function handleClick() {
     const color = document.querySelector("#colors").value
     const quantity = document.querySelector("#quantity").value
@@ -70,7 +71,7 @@ function handleClick() {
     saveCart(color, quantity)
     redirectToCart()
 }
-
+  
 function saveCart(color,quantity) {
     const key = `${id}-${color}`
     const cartData = {
@@ -79,10 +80,40 @@ function saveCart(color,quantity) {
                 color: color,
                 quantity: Number(quantity),
                 imageUrl: imgUrl,
-                altTxt: altText
+                altTxt: altText,
+                price: itemPrice,
     }
-    localStorage.setItem(key, JSON.stringify(cartData))
+    localStorage.setItem(key, JSON.stringify(cartData))   
 }
+
+/*
+function saveCart(color,quantity) {
+        const key = `${id}-${color}`
+        const product = {
+                    name: productName,
+                    id: id,
+                    color: color,
+                    quantity: Number(quantity),
+                    imageUrl: imgUrl,
+                    altTxt: altText,
+                    price: itemPrice,
+        }
+
+        let cart = [];
+        if (localStorage.getItem("cart")) {
+            cart = JSON.parse(localStorage.getItem("cart"));
+        }
+        let foundProduct = cart.find(
+        (item) => item.key === key)
+        // Gestion des quantités
+        if (foundProduct === undefined) {
+            cart.push(product);
+        } else {
+            foundProduct.quantity += product.quantity;
+        }
+localStorage.setItem(key, JSON.stringify(product))       
+}
+*/
 function cartNotValid(color,quantity) {
     if (color == null || color === "" || quantity == null || quantity == 0) {
         alert("Merci de selectionner une quantité et un prix")
@@ -91,5 +122,6 @@ function cartNotValid(color,quantity) {
 }
 
 function redirectToCart() {
+    alert("Votre produit a bien été ajouté au panier");
     window.location.href = "cart.html"
 }
