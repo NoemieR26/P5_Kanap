@@ -1,16 +1,17 @@
 // Récupération des données du localStorage
 const cart =[]
-const productData = []
+
+/*const productData = []
 console.log(productData) 
-//-> productData est vide...
+//-> productData est vide...*/
 retrieveItems()
 cart.forEach((item) => displayItem(item))
-
+cart.forEach((data) => displayItemPrice(data))
 
 const orderButton = document.querySelector("#order")
 orderButton.addEventListener("click", (e) => submitForm(e))
 
-// Récupération des prix depuis l'API
+/*// Récupération des prix depuis l'API
 function getDataFromAPI(id) {
   fetch("http://localhost:3000/api/products/" + id)
   .then((res) => {
@@ -24,15 +25,69 @@ function getDataFromAPI(id) {
   })
 
 }
+*/
+// Récupération des données depuis l'API
+async function fetchData(id_product, quantity){
 
-//Ajout du prix des produits
+    let response = await fetch("http://localhost:3000/api/products/" + id_product);
+    let data = await response.json();
+
+    data = JSON.stringify(data);
+    data = JSON.parse(data);
+    return data.price * quantity;
+}
+
+async function displayItemPrice(id, quantity) {
+    let response = await fetchData(id, quantity);
+    console.log(response);
+}
+
+/*
+async function getDataFromAPI(id) {
+    return (await fetch(`http://localhost:3000/api/products/${id}`)).json();
+  }
+
+// Appel de la fonction 
+const productData = async (id) => {
+    try {
+      return getDataFromAPI(id);
+    } catch {
+      console.error("Erreur lors de la récupération des données du produit");
+    }
+    console.log(productData)
+  };
+  
+  productData()
+*/
+/*  //Ajout du prix des produits
 function pushPriceFromAPI(id, itemPrice, item) {
    // const itemPrice = price
         //const itemPrice = productData.find((item) => item.id === id)
         itemPrice.price = Number(price)
         cart.push(itemPrice)
 }
-
+*/
+/*
+async function getPriceFromAPI(id) {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/products/${id}`
+      );
+      const productData = await response.json();
+  
+      const completeItem = {
+        ...article,
+        ...dataFetch,
+      };
+      displayItem(completeItem);
+  
+      return productData.price;
+    } catch (e) {
+      console.log("Erreur");
+    }
+  }
+getPriceFromAPI()
+*/
 
 function retrieveItems() {
     const numberOfItems = localStorage.length
@@ -61,7 +116,7 @@ function displayItem(item) {
     const cartItemContent = createCartContent(item)
     article.appendChild(cartItemContent)
     displayArticle(article)
-    //displayItemPrice(article)
+    displayItemPrice(item.id, item.quantity)
     displayTotalQuantity()
     displayTotalPrice(item)
 }
@@ -88,11 +143,11 @@ function createImageDiv(item) {
 }
 
 //Affichage du prix
-/*function productPrice(price) {
+function productPrice(price) {
     const span = document.querySelector("#price")
     if (span != null) span.textContent = price
     return price
-}*/
+}
 
 // Création de l'élément "item content"
 function createCartContent(item) {
@@ -118,7 +173,7 @@ function addDescription(item) {
     p.textContent = item.color
     const p2 = document.createElement("p")
     p2.textContent = item.price + " €"
-
+    
     description.appendChild(h2)
     description.appendChild(p)
     description.appendChild(p2)
@@ -155,12 +210,12 @@ function addQuantity(settings, item) {
     settings.appendChild(quantity)
 }
 
-function updatePriceAndQuantity(id, newValue, item) {
+function updatePriceAndQuantity(id, newValue, item, data) {
     const itemToUpdate = cart.find((item) => item.id === id)
     itemToUpdate.quantity = Number(newValue)
     item.quantity = itemToUpdate.quantity
     displayTotalQuantity()
-   // displayTotalPrice()
+    displayTotalPrice(data)
     saveNewData(item) 
 }
 /*

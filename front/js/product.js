@@ -74,6 +74,7 @@ function handleClick() {
   
 function saveCart(color,quantity) {
     const key = `${id}-${color}`
+    console.log(key)
     const cartData = {
                 name: productName,
                 id: id,
@@ -81,7 +82,7 @@ function saveCart(color,quantity) {
                 quantity: Number(quantity),
                 imageUrl: imgUrl,
                 altTxt: altText,
-                price: itemPrice,
+                //price: itemPrice,
     }
     localStorage.setItem(key, JSON.stringify(cartData))   
 }
