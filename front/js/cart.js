@@ -4,9 +4,16 @@ const cart =[]
 /*const productData = []
 console.log(productData) 
 //-> productData est vide...*/
+function retrieveItems() {
+    const numberOfItems = localStorage.length
+    for (let i = 0; i < numberOfItems; i++) {
+        const item = localStorage.getItem(localStorage.key(i)) || ""
+        const itemObject = JSON.parse(item)
+        cart.push(itemObject)
+    }
+}
 retrieveItems()
 cart.forEach((item) => displayItem(item))
-cart.forEach((data) => displayItemPrice(data))
 
 const orderButton = document.querySelector("#order")
 orderButton.addEventListener("click", (e) => submitForm(e))
@@ -89,14 +96,7 @@ async function getPriceFromAPI(id) {
 getPriceFromAPI()
 */
 
-function retrieveItems() {
-    const numberOfItems = localStorage.length
-    for (let i = 0; i < numberOfItems; i++) {
-        const item = localStorage.getItem(localStorage.key(i)) || ""
-        const itemObject = JSON.parse(item)
-        cart.push(itemObject)
-    }
-}
+
 
 // Affichage du produit
 

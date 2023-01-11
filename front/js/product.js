@@ -84,37 +84,25 @@ function saveCart(color,quantity) {
                 altTxt: altText,
                 //price: itemPrice,
     }
-    localStorage.setItem(key, JSON.stringify(cartData))   
-}
-
-/*
-function saveCart(color,quantity) {
-        const key = `${id}-${color}`
+    let cart = [];
+ 
+    if (localStorage.getItem(key)) {
+        cart = JSON.parse(localStorage.getItem(key)); 
         const product = {
-                    name: productName,
-                    id: id,
-                    color: color,
-                    quantity: Number(quantity),
-                    imageUrl: imgUrl,
-                    altTxt: altText,
-                    price: itemPrice,
+            name: productName,
+            id: id,
+            color: color,
+            quantity: Number(cart.quantity) + Number(quantity),
+            imageUrl: imgUrl,
+            altTxt: altText,
         }
-
-        let cart = [];
-        if (localStorage.getItem("cart")) {
-            cart = JSON.parse(localStorage.getItem("cart"));
-        }
-        let foundProduct = cart.find(
-        (item) => item.key === key)
-        // Gestion des quantités
-        if (foundProduct === undefined) {
-            cart.push(product);
-        } else {
-            foundProduct.quantity += product.quantity;
-        }
-localStorage.setItem(key, JSON.stringify(product))       
+       localStorage.setItem(key, JSON.stringify(product));
+    } 
+    else {
+        localStorage.setItem(key, JSON.stringify(cartData)); 
+    }
 }
-*/
+
 function cartNotValid(color,quantity) {
     if (color == null || color === "" || quantity == null || quantity == 0) {
         alert("Merci de selectionner une quantité et un prix")
