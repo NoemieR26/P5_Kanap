@@ -1,15 +1,13 @@
 // Récupération des données du localStorage
 const cart =[]
 
-/*const productData = []
-console.log(productData) 
-//-> productData est vide...*/
-function retrieveItems() {
+async function retrieveItems() {
     const numberOfItems = localStorage.length
     for (let i = 0; i < numberOfItems; i++) {
         const item = localStorage.getItem(localStorage.key(i)) || ""
         const itemObject = JSON.parse(item)
         cart.push(itemObject)
+        console.log(cart)
     }
 }
 retrieveItems()
@@ -18,36 +16,25 @@ cart.forEach((item) => displayItem(item))
 const orderButton = document.querySelector("#order")
 orderButton.addEventListener("click", (e) => submitForm(e))
 
-/*// Récupération des prix depuis l'API
-function getDataFromAPI(id) {
-  fetch("http://localhost:3000/api/products/" + id)
-  .then((res) => {
-    return res.json();
-  })
-  .then(async function (productData) {
-    console.log(productData)
-  })
-  .catch((error) => {
-    console.log(error);
-  })
-
-}
-*/
 // Récupération des données depuis l'API
-async function fetchData(id_product, quantity){
+async function fetchData(id_product){
 
     let response = await fetch("http://localhost:3000/api/products/" + id_product);
     let data = await response.json();
 
     data = JSON.stringify(data);
     data = JSON.parse(data);
-    return data.price * quantity;
+    console.log (data.name)
+    return data.price;
 }
 
-async function displayItemPrice(id, quantity) {
-    let response = await fetchData(id, quantity);
-    console.log(response);
+async function displayItemPrice(key) {
+    let itemPrice = await fetchData(key);
+    cart.push(itemPrice);
+    
+    console.log(cart)
 }
+
 
 /*
 async function getDataFromAPI(id) {
@@ -163,7 +150,7 @@ function createCartContent(item) {
 }
 
 // Ajout de la description (nom, couleur, prix)
-function addDescription(item) {
+function addDescription(item, data) {
     const description = document.createElement("div")
     description.classList.add("cart__item__content__description")
 

@@ -22,7 +22,6 @@ function handleData(kanap) {
      productPrice(price)
      productDescription(description)
      productColors(colors)
-     console.log(price)
 }
 
 function productImage(imageUrl,altTxt) {
@@ -74,7 +73,6 @@ function handleClick() {
   
 function saveCart(color,quantity) {
     const key = `${id}-${color}`
-    console.log(key)
     const cartData = {
                 name: productName,
                 id: id,
