@@ -1,89 +1,45 @@
 // Récupération des données du localStorage
 const cart =[]
 
-async function retrieveItems() {
+fetch(`http://localhost:3000/api/products/`)
+    .then((response) => response.json())
+    .then((res) => handleCartData(res))
+
+function handleCartData(kanapList) {
+   const [] = kanapList;
+   console.log(kanapList)
+
+    console.log(getItemPrice(kanapList,kanapList[0]._id))
+
+   retrieveItems()
+   cart.forEach((item) => displayItem(kanapList, item))
+}
+
+function getItemPrice(kanapList, id) {
+    const numberOfProducts = kanapList.length
+    for (let i = 0; i < numberOfProducts; i++) {
+        if (kanapList[i]._id == id)
+            return kanapList[i].price
+    }
+    return 0
+}
+
+function retrieveItems() {
     const numberOfItems = localStorage.length
     for (let i = 0; i < numberOfItems; i++) {
         const item = localStorage.getItem(localStorage.key(i)) || ""
         const itemObject = JSON.parse(item)
         cart.push(itemObject)
-        console.log(cart)
     }
 }
-retrieveItems()
-cart.forEach((item) => displayItem(item))
+//retrieveItems()
+//cart.forEach((item) => displayItem(item))
+
 
 const orderButton = document.querySelector("#order")
 orderButton.addEventListener("click", (e) => submitForm(e))
 
 // Récupération des données depuis l'API
-async function fetchData(id_product){
-
-    let response = await fetch("http://localhost:3000/api/products/" + id_product);
-    let data = await response.json();
-
-    data = JSON.stringify(data);
-    data = JSON.parse(data);
-    console.log (data.name)
-    return data.price;
-}
-
-async function displayItemPrice(key) {
-    let itemPrice = await fetchData(key);
-    cart.push(itemPrice);
-    
-    console.log(cart)
-}
-
-
-/*
-async function getDataFromAPI(id) {
-    return (await fetch(`http://localhost:3000/api/products/${id}`)).json();
-  }
-
-// Appel de la fonction 
-const productData = async (id) => {
-    try {
-      return getDataFromAPI(id);
-    } catch {
-      console.error("Erreur lors de la récupération des données du produit");
-    }
-    console.log(productData)
-  };
-  
-  productData()
-*/
-/*  //Ajout du prix des produits
-function pushPriceFromAPI(id, itemPrice, item) {
-   // const itemPrice = price
-        //const itemPrice = productData.find((item) => item.id === id)
-        itemPrice.price = Number(price)
-        cart.push(itemPrice)
-}
-*/
-/*
-async function getPriceFromAPI(id) {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/products/${id}`
-      );
-      const productData = await response.json();
-  
-      const completeItem = {
-        ...article,
-        ...dataFetch,
-      };
-      displayItem(completeItem);
-  
-      return productData.price;
-    } catch (e) {
-      console.log("Erreur");
-    }
-  }
-getPriceFromAPI()
-*/
-
-
 
 // Affichage du produit
 
@@ -92,27 +48,22 @@ function createArticle(item) {
     article.classList.add("cart__item")
     article.dataset.id = item.id
     article.dataset.color = item.color
-    article.dataset.price = item.price
     return article
+    
 }
 
-function displayItem(item) {
+function displayItem(kanapList, item) {
     const article = createArticle(item)
     const imageDiv = createImageDiv(item)
     article.appendChild(imageDiv)
-    const cartItemContent = createCartContent(item)
+    const cartItemContent = createCartContent(kanapList, item)
     article.appendChild(cartItemContent)
     displayArticle(article)
-    displayItemPrice(item.id, item.quantity)
+    //displayItemPrice(item.id)
     displayTotalQuantity()
-    displayTotalPrice(item)
+    displayTotalPrice(kanapList, item)
 }
-/*
-function displayItemPrice(article) {
-  const price = itemPrice
-  displayItemPrice(article)
-}
-*/
+
 function displayArticle(article) {
     document.querySelector("#cart__items").appendChild(article)
 }    
@@ -129,20 +80,13 @@ function createImageDiv(item) {
     return div
 }
 
-//Affichage du prix
-function productPrice(price) {
-    const span = document.querySelector("#price")
-    if (span != null) span.textContent = price
-    return price
-}
-
 // Création de l'élément "item content"
-function createCartContent(item) {
+function createCartContent(kanapList, item) {
     const cartItemContent = document.createElement("div")
     cartItemContent.classList.add("cart__item__content")
 
-    const description = addDescription(item)
-    const settings = addSettings(item)
+    const description = addDescription(kanapList, item)
+    const settings = addSettings(kanapList, item)
 
     cartItemContent.appendChild(description)
     cartItemContent.appendChild(settings)
@@ -150,7 +94,7 @@ function createCartContent(item) {
 }
 
 // Ajout de la description (nom, couleur, prix)
-function addDescription(item, data) {
+function addDescription(kanapList, item) {
     const description = document.createElement("div")
     description.classList.add("cart__item__content__description")
 
@@ -159,7 +103,7 @@ function addDescription(item, data) {
     const p = document.createElement("p")
     p.textContent = item.color
     const p2 = document.createElement("p")
-    p2.textContent = item.price + " €"
+    p2.textContent = getItemPrice(kanapList, item.id) + " €"
     
     description.appendChild(h2)
     description.appendChild(p)
@@ -168,17 +112,17 @@ function addDescription(item, data) {
 }
 
 // Ajout des Settings
-function addSettings(item) {
+function addSettings(kanapList, item) {
     const settings = document.createElement("div")
     settings.classList.add("cart__item__content__settings")
 
-    addQuantity(settings, item)
-    addDelete(settings, item)
+    addQuantity(kanapList, settings, item)
+    addDelete(kanapList, settings, item)
     return settings
 }
 
 // Ajout de la quantité
-function addQuantity(settings, item) {
+function addQuantity(kanapList, settings, item) {
     const quantity = document.createElement("div")
     quantity.classList.add("cart__item__content__settings__quantity")
     const p = document.createElement("p")
@@ -191,52 +135,21 @@ function addQuantity(settings, item) {
     input.min = "1"
     input.max = "100"
     input.value = item.quantity
-    input.addEventListener("input", () => updatePriceAndQuantity(item.id, input.value, item))
+    input.addEventListener("input", () => updatePriceAndQuantity(kanapList, item.id, input.value, item))
     
     quantity.appendChild(input)
     settings.appendChild(quantity)
 }
 
-function updatePriceAndQuantity(id, newValue, item, data) {
+function updatePriceAndQuantity(kanapList, id, newValue, item) {
     const itemToUpdate = cart.find((item) => item.id === id)
     itemToUpdate.quantity = Number(newValue)
     item.quantity = itemToUpdate.quantity
     displayTotalQuantity()
-    displayTotalPrice(data)
+    displayTotalPrice(kanapList)
     saveNewData(item) 
 }
-/*
-//Mise à jour des quantités dans le panier
-function addToCart(item) {
-    let cart = retrieveItems();
-    let foundProduct = cart.find((item) => item.id === id)
-    if (foundProduct != undefined) {
-        foundProduct.quantity++;
-     } else {
-            item.quantity = 1;
-            cart.push(item);
-        }
-        saveNewData(cart) 
-}
-*/
-//Mise à jour du prix et de la quantité
-/*
-function updatePriceAndQuantity(id, newValue, item) {
-    const itemToUpdate = cart.find((item) => item.id === id)
-    if (itemToUpdate != undefined) {
-        itemToUpdate.quantity++
-    }
-    else {
-        itemToUpdate.quantity = Number(newValue)
-        cart.push(newValue)
-    }
-    
-    item.quantity = itemToUpdate.quantity
-    displayTotalQuantity()
-    //displayTotalPrice()
-    saveNewData(item) 
-}
-*/
+
 //Suppression d'un article du LocalStorage
 function deleteDataFromCache(item) {
     const key = `${item.id}-${item.color}`
@@ -253,10 +166,10 @@ function saveNewData(item) {
 }
 
 // Ajout de l'élément "supprimer"
-function addDelete(settings, item) {
+function addDelete(kanapList, settings, item) {
     const deleteDiv = document.createElement("div")
     deleteDiv.classList.add("cart__item__content__settings__delete")
-    deleteDiv.addEventListener("click", () => deleteItem(item))
+    deleteDiv.addEventListener("click", () => deleteItem(kanapList, item))
     const p = document.createElement("p")
     p.classList.add("deleteItem")
     p.textContent = "Supprimer"
@@ -265,13 +178,13 @@ function addDelete(settings, item) {
 }
 
 //Fonction supprimer
-function deleteItem(item) {
+function deleteItem(kanapList, item) {
     const itemToDelete = cart.findIndex(
         (product) => product.id === item.id && product.color === item.color
     )
     cart.splice(itemToDelete, 1)
     displayTotalQuantity
-    displayTotalPrice
+    displayTotalPrice(kanapList)
     deleteDataFromCache(item)
     deleteProductFromCart(item)
 }
@@ -294,11 +207,11 @@ function displayTotalQuantity() {
 }
     
 //Affichage du prix total
-function displayTotalPrice(item) {
+function displayTotalPrice(kanapList) {
     let total = 0
     const totalPrice= document.querySelector("#totalPrice")
     cart.forEach((item) => {
-        const totalUnitPrice = item.price * item.quantity
+        const totalUnitPrice = getItemPrice(kanapList, item.id) * item.quantity
         total += totalUnitPrice
     })
     totalPrice.textContent = total

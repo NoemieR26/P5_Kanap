@@ -41,6 +41,7 @@ function productTitle(name) {
 function productPrice(price) {
     const span = document.querySelector("#price")
     if (span != null) span.textContent = price
+    console.log(price)
 }
 
 function productDescription(description) {
