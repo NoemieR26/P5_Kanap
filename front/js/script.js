@@ -1,5 +1,4 @@
 /*Récupération des données depuis l'API*/
-
 async function getData () {
     const response = await fetch("http://localhost:3000/api/products")
     if (response.ok === true) {
@@ -9,7 +8,6 @@ async function getData () {
 }
 
 /*Affichage des produits*/
-
 getData().then(data => {
     let list_product =  document.getElementById("items");  
     for (let item of data) {

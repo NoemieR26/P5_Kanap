@@ -1,16 +1,13 @@
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const id = urlParams.get("id")
-/*if (id != null) {
-    let itemPrice = 0
-    let imgUrl, altText, productName
-}
-*/
 
+//Récupération des données depuis l'API par ID
 fetch(`http://localhost:3000/api/products/${id}`)
     .then((response) => response.json())
     .then((res) => handleData(res))
 
+//Gestion des données
 function handleData(kanap) {
      const {colors, name, price, imageUrl, description, altTxt} = kanap
      itemPrice = price
@@ -24,6 +21,7 @@ function handleData(kanap) {
      productColors(colors)
 }
 
+//Affichage de l'image
 function productImage(imageUrl,altTxt) {
     const image = document.createElement("img")
     image.src = imageUrl
@@ -32,23 +30,25 @@ function productImage(imageUrl,altTxt) {
     if (parent != null) parent.appendChild(image)
 }
 
+//Affichage du nom
 function productTitle(name) {
     const h1 = document.querySelector("#title")
     if (h1 != null) h1.textContent = name
-    console.log(name)
 }
 
+//Affichage du prix
 function productPrice(price) {
     const span = document.querySelector("#price")
     if (span != null) span.textContent = price
-    console.log(price)
 }
 
+//Affichage de la description
 function productDescription(description) {
     const p = document.querySelector("#description")
     if (p != null) p.textContent = description
 }
 
+//Sélection de la couleur
 function productColors(colors) {
     const select = document.querySelector("#colors")
     if (select != null) {
@@ -61,6 +61,7 @@ function productColors(colors) {
     }
 }
 
+//Gestion du bouton "ajouter au panier"
 const button = document.querySelector('#addToCart')
     button.addEventListener("click", handleClick)
 
@@ -71,7 +72,8 @@ function handleClick() {
     saveCart(color, quantity)
     redirectToCart()
 }
-  
+
+//Sauvegarde du panier dans le localStorage
 function saveCart(color,quantity) {
     const key = `${id}-${color}`
     const cartData = {
@@ -80,8 +82,7 @@ function saveCart(color,quantity) {
                 color: color,
                 quantity: Number(quantity),
                 imageUrl: imgUrl,
-                altTxt: altText,
-                //price: itemPrice,
+                altTxt: altText
     }
     let cart = [];
  
@@ -102,6 +103,7 @@ function saveCart(color,quantity) {
     }
 }
 
+//Gestion d'erreur si toutes les informations ne sont pas renseignées
 function cartNotValid(color,quantity) {
     if (color == null || color === "" || quantity == null || quantity == 0) {
         alert("Merci de selectionner une quantité et un prix")
@@ -109,6 +111,7 @@ function cartNotValid(color,quantity) {
     }
 }
 
+//Redirection vers le panier après l'ajout
 function redirectToCart() {
     alert("Votre produit a bien été ajouté au panier");
     window.location.href = "cart.html"

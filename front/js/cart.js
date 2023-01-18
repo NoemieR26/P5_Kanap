@@ -1,29 +1,26 @@
-// Récupération des données du localStorage
 const cart =[]
 
+// Récupération des données depuis l'API
 fetch(`http://localhost:3000/api/products/`)
     .then((response) => response.json())
     .then((res) => handleCartData(res))
 
 function handleCartData(kanapList) {
    const [] = kanapList;
-   console.log(kanapList)
-
-    console.log(getItemPrice(kanapList,kanapList[0]._id))
-
    retrieveItems()
    cart.forEach((item) => displayItem(kanapList, item))
 }
 
+//Récupération du prix des canapés
 function getItemPrice(kanapList, id) {
     const numberOfProducts = kanapList.length
     for (let i = 0; i < numberOfProducts; i++) {
         if (kanapList[i]._id == id)
             return kanapList[i].price
     }
-    return 0
 }
 
+// Récupération des données du localStorage
 function retrieveItems() {
     const numberOfItems = localStorage.length
     for (let i = 0; i < numberOfItems; i++) {
@@ -32,24 +29,18 @@ function retrieveItems() {
         cart.push(itemObject)
     }
 }
-//retrieveItems()
-//cart.forEach((item) => displayItem(item))
 
-
+// Gestion du bouton "commander"
 const orderButton = document.querySelector("#order")
 orderButton.addEventListener("click", (e) => submitForm(e))
 
-// Récupération des données depuis l'API
-
-// Affichage du produit
-
+// Affichage des produits
 function createArticle(item) {
     const article = document.createElement("article")
     article.classList.add("cart__item")
     article.dataset.id = item.id
     article.dataset.color = item.color
     return article
-    
 }
 
 function displayItem(kanapList, item) {
@@ -59,7 +50,6 @@ function displayItem(kanapList, item) {
     const cartItemContent = createCartContent(kanapList, item)
     article.appendChild(cartItemContent)
     displayArticle(article)
-    //displayItemPrice(item.id)
     displayTotalQuantity()
     displayTotalPrice(kanapList, item)
 }
@@ -111,7 +101,7 @@ function addDescription(kanapList, item) {
     return description
 }
 
-// Ajout des Settings
+// Ajout des settings
 function addSettings(kanapList, item) {
     const settings = document.createElement("div")
     settings.classList.add("cart__item__content__settings")
@@ -141,6 +131,7 @@ function addQuantity(kanapList, settings, item) {
     settings.appendChild(quantity)
 }
 
+// Mise à jour du prix et de la quantité
 function updatePriceAndQuantity(kanapList, id, newValue, item) {
     const itemToUpdate = cart.find((item) => item.id === id)
     itemToUpdate.quantity = Number(newValue)
@@ -153,7 +144,6 @@ function updatePriceAndQuantity(kanapList, id, newValue, item) {
 //Suppression d'un article du LocalStorage
 function deleteDataFromCache(item) {
     const key = `${item.id}-${item.color}`
-    console.log("on retire cette key",key)
     localStorage.removeItem(key)
     location.reload()
 }

@@ -2,7 +2,7 @@ const orderId = getOrderId()
 displayOrderId(orderId)
 removeAllCache()
 
-//
+//Récupération du n° de commande
 function getOrderId() {
     const queryString = window.location.search
     const urlParams = new URLSearchParams(queryString)
