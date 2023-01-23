@@ -12,11 +12,11 @@ function getOrderId() {
 //Affichage du numéro de commande
 function displayOrderId(orderId) {
     const orderIdElement = document.getElementById("orderId")
-    orderIdElement.textContent = orderId
+    orderIdElement.textContent = orderId;
 }
 
 //Suppression des données du LocalStorage
 function removeAllCache() {
-    const cache = window.localStorage
-    cache.clear()
+    const cache = window.localStorage;
+    cache.clear();
 }

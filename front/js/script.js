@@ -4,7 +4,7 @@ async function getData () {
     if (response.ok === true) {
         return response.json();
     }
-    throw new Error ('Impossible de contacter le serveur')
+    throw new Error ('Impossible de contacter le serveur');
 }
 
 /*Affichage des produits*/
