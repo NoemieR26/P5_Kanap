@@ -135,9 +135,27 @@ function updatePriceAndQuantity(kanapList, id, newValue, item) {
     const itemToUpdate = cart.find((item) => item.id === id);
     itemToUpdate.quantity = Number(newValue);
     item.quantity = itemToUpdate.quantity;
+    if (item.quantity <= 0){
+        alert("Vous n'avez pas atteint la quantité minimum");
+        return true;
+    }
     displayTotalQuantity();
     displayTotalPrice(kanapList);
     saveNewData(item);
+}
+
+function maxQuantity(quantity) {
+    if (quantity > 100) {
+        alert("Vous avez dépassé la quantité maximum");
+        return true;
+    }
+}
+
+function minQuantity(quantity) {
+    if (quantity <= 0) {
+        alert("Vous n'avez pas atteint la quantité minimum");
+        return true;
+    }
 }
 
 //Suppression d'un article du LocalStorage
@@ -184,7 +202,6 @@ function deleteProductFromCart(item) {
     'product[data-id="${item.id}"][data-color="${item.color}"]'
     );
 productToDelete.remove();
-
 }
 
 // Affichage de la quantité totale
@@ -206,7 +223,7 @@ function displayTotalPrice(kanapList) {
     totalPrice.textContent = total;
 }
 
-
+//Envoi du formulaire
 function submitForm(e) {
     e.preventDefault()
     if (cart.length === 0) {
@@ -238,16 +255,20 @@ if (emailInvalid()) return;
     .catch((err) => console.log(err));
 }
 
+//Gestion d'erreurs du formulaire
 function formInvalid() {
   const form = document.querySelector(".cart__order__form");
   const inputs = form.querySelectorAll("input");
+  let error = false;
   inputs.forEach((input) => {
     if (input.value === "") {
-        alert ("Merci de renseigner tous les champs");
-        return true;
+        error = true; 
     }
-    return false;
   })  
+  if (error == true) {
+    alert ("Merci de renseigner tous les champs");
+  }
+  return error;
 }
 
 function firstNameInvalid() {
@@ -300,6 +321,7 @@ function emailInvalid() {
       return false;
 }
 
+//Récupération des données du formulaire et du panier
 function formContentRequest() {
     const form = document.querySelector(".cart__order__form");
     const firstName = form.elements.firstName.value;

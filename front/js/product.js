@@ -70,6 +70,7 @@ function handleClick() {
     const quantity = document.querySelector("#quantity").value;
     if (cartNotValid(color, quantity)) return;
     if (maxQuantity(quantity)) return;
+    if (minQuantity(quantity)) return;
     saveCart(color, quantity);
     redirectToCart()
 }
@@ -114,11 +115,17 @@ function cartNotValid(color,quantity) {
 
 function maxQuantity(quantity) {
     if (quantity > 100) {
-        alert("vous avez dépassé la quantité maximum");
+        alert("Vous avez dépassé la quantité maximum");
         return true;
     }
 }
-    
+
+function minQuantity(quantity) {
+    if (quantity < 0) {
+        alert("Vous n'avez pas atteint la quantité minimum");
+        return true;
+    }
+}
 
 //Redirection vers le panier après l'ajout
 function redirectToCart() {
